@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<bean id="userPersistence" class="com.uchoice.persistance.UUserPersistenceProvider"></bean>
+
+	<bean id="userService" class="com.uchoice.service.UUserServiceImpl">
+		<property name="userPersistence" ref="userPersistence"></property>
+		<property name="passwordEncoder" ref="passwordEncoder" />
+	</bean>
+
+	<bean id="uLogger" class="com.uchoice.log.ULogger"></bean>
+
+	<aop:config>
+
+		<aop:aspect id="beforeLog" ref="uLogger">
+			<aop:pointcut
+				expression="execution(* com.uchoice.service.*.*(..)) or execution(* com.uchoice.spring.*.*(..))"
+				id="beforeLogPintcut" />
+			<aop:before method="before" pointcut-ref="beforeLogPintcut" />
+		</aop:aspect>
+		<aop:aspect id="afterReturingLog" ref="uLogger">
+			<aop:pointcut
+				expression="execution(* com.uchoice.service.*.*(..)) or execution(* com.uchoice.spring.*.*(..))"
+				id="afterReturingPointcut" />
+			<aop:after-returning method="afterReturning"
+				pointcut-ref="afterReturingPointcut" />
+		</aop:aspect>
+		<aop:aspect id="afterThrowingLog" ref="uLogger">
+			<aop:pointcut
+				expression="execution(* com.uchoice.service.*.*(..)) or execution(* com.uchoice.spring.*.*(..))"
+				id="afterThrowingPointcut" />
+			<aop:after-throwing method="afterThrowing"
+				pointcut-ref="afterThrowingPointcut" throwing="e" />
+		</aop:aspect>
+	</aop:config>
+
+</beans>
